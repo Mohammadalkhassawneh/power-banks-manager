@@ -1,17 +1,30 @@
 class Users::SessionsController < Devise::SessionsController
   respond_to :json
 
-  private
+  def create
+    user = User.find_by(email: params[:user][:email])
 
-  def respond_with(resource, _opts = {})
-    render json: { message: 'Logged in successfully.', user: resource }, status: :ok
+    if user&.valid_password?(params[:user][:password])
+      token = encode_token(user_id: user.id)
+      render json: {
+        message: 'Logged in successfully.',
+        user: {
+          id: user.id,
+          email: user.email,
+          created_at: user.created_at,
+          updated_at: user.updated_at,
+          role: user.role
+        },
+        jwt: token
+      }
+    else
+      render json: { error: 'Invalid email or password.' }, status: :unauthorized
+    end
   end
 
-  def respond_to_on_destroy
-    if current_user
-      render json: { message: 'Logged out successfully.' }, status: :ok
-    else
-      render json: { message: 'No active session.' }, status: :unauthorized
-    end
+  private
+
+  def encode_token(payload)
+    JWT.encode(payload, Rails.application.credentials.dig(:devise, :jwt_secret_key))
   end
 end
