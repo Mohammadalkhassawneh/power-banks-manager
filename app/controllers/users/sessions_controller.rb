@@ -5,7 +5,7 @@ class Users::SessionsController < Devise::SessionsController
     user = User.find_by(email: params[:user][:email])
 
     if user&.valid_password?(params[:user][:password])
-      token = encode_token(user.id)
+      token = encode_token(user)
       render json: {
         message: 'Logged in successfully.',
         user: {
@@ -24,10 +24,10 @@ class Users::SessionsController < Devise::SessionsController
 
   private
 
-  def encode_token(user_id)
+  def encode_token(user)
     payload = {
-      sub: user_id,
-      jti: SecureRandom.uuid,
+      sub: user.id,
+      jti: user.jti,
       exp: Time.now.to_i + 1.day.to_i
     }
     JWT.encode(payload, Rails.application.credentials.dig(:devise, :jwt_secret_key))
