@@ -12,6 +12,7 @@ class StationsController < ApplicationController
 
   def create
     @station = Station.new(station_params)
+    authorize @station
     if @station.save
       render json: @station, status: :created
     else
