@@ -22,13 +22,26 @@ class Users::SessionsController < Devise::SessionsController
     end
   end
 
+  def destroy
+    sign_out(current_user) if user_signed_in?
+
+    head :no_content
+  end
+
+  protected
+
+  def respond_to_on_destroy
+    head :no_content
+  end
+
   private
 
   def encode_token(user)
     payload = {
       sub: user.id,
       jti: user.jti,
-      exp: Time.now.to_i + 1.day.to_i
+      exp: Time.now.to_i + 1.day.to_i,
+      scope: user.role
     }
     JWT.encode(payload, Rails.application.credentials.dig(:devise, :jwt_secret_key))
   end
