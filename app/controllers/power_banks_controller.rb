@@ -1,8 +1,8 @@
 class PowerBanksController < ApplicationController
-  before_action :set_power_bank, only: [:show, :update, :destroy]
+  before_action :set_power_bank, only: [:show, :update, :destroy, :assign_to_station, :assign_to_warehouse, :assign_to_user]
 
   def index
-    @q = PowerBank.ransack(params[:q])
+    @q = policy_scope(PowerBank).ransack(params[:q])
     @power_banks = @q.result.page(params[:page]).per(params[:per_page] || 10)
     render json: {
       power_banks: @power_banks,
@@ -38,6 +38,45 @@ class PowerBanksController < ApplicationController
   def destroy
     @power_bank.destroy
     head :no_content
+  end
+
+  def assign_to_station
+    authorize @power_bank, :assign_to_station?
+
+    @station = Station.find(params[:station_id])
+
+    if @power_bank.update(station: @station)
+      redirect_to @station, notice: 'Power bank was successfully assigned to station.'
+    else
+      flash[:alert] = @power_bank.errors.full_messages.join('. ')
+      redirect_back(fallback_location: root_path)
+    end
+  end
+
+  def assign_to_warehouse
+    authorize @power_bank, :assign_to_warehouse?
+
+    @warehouse = Warehouse.find(params[:warehouse_id])
+
+    if @power_bank.update(warehouse: @warehouse)
+      redirect_to @warehouse, notice: 'Power bank was successfully assigned to warehouse.'
+    else
+      flash[:alert] = @power_bank.errors.full_messages.join('. ')
+      redirect_back(fallback_location: root_path)
+    end
+  end
+
+  def assign_to_user
+    authorize @power_bank, :assign_to_user?
+
+    @user = User.find(params[:user_id])
+
+    if @power_bank.update(user: @user)
+      redirect_to @user, notice: 'Power bank was successfully assigned to user.'
+    else
+      flash[:alert] = @power_bank.errors.full_messages.join('. ')
+      redirect_back(fallback_location: root_path)
+    end
   end
 
   private
