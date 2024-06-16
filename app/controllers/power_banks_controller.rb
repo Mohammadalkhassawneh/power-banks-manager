@@ -2,8 +2,15 @@ class PowerBanksController < ApplicationController
   before_action :set_power_bank, only: [:show, :update, :destroy]
 
   def index
-    @power_banks = PowerBank.all
-    render json: @power_banks
+    @power_banks = PowerBank.page(params[:page]).per(params[:per_page] || 10)
+    render json: {
+      power_banks: @power_banks,
+      meta: {
+        current_page: @power_banks.current_page,
+        total_pages: @power_banks.total_pages,
+        total_count: @power_banks.total_count
+      }
+    }
   end
 
   def show
