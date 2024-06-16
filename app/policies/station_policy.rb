@@ -7,7 +7,33 @@ class StationPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def view_power_banks?
-    user.normal_user?
+  def index?
+    true
+  end
+
+  def show?
+    true
+  end
+
+  def available_power_banks?
+    true
+  end
+
+  def take_power_bank?
+    true
+  end
+
+  def return_power_bank?
+    true
+  end
+
+  class Scope < Scope
+    def resolve
+      if user.admin?
+        scope.all
+      else
+        scope.joins(:power_banks).where(power_banks: { user_id: nil }).distinct
+      end
+    end
   end
 end

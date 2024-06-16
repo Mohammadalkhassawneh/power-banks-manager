@@ -2,7 +2,7 @@ class StationsController < ApplicationController
   before_action :set_station, only: [:show, :update, :destroy]
 
   def index
-    @stations = Station.all
+    @stations = policy_scope(Station)
     render json: @stations
   end
 
@@ -31,6 +31,26 @@ class StationsController < ApplicationController
   def destroy
     @station.destroy
     head :no_content
+  end
+
+  def available_power_banks
+    authorize @station, :available_power_banks?
+    @available_power_banks = @station.power_banks.where(user_id: nil) # Assuming user_id is nil for available power banks
+    render json: @available_power_banks
+  end
+
+  def take_power_bank
+    authorize @station, :take_power_bank?
+    @power_bank = @station.power_banks.find(params[:power_bank_id])
+    @power_bank.update(user_id: current_user.id) # Assign power bank to current user
+    render json: @power_bank
+  end
+
+  def return_power_bank
+    authorize @station, :return_power_bank?
+    @power_bank = @station.power_banks.find(params[:power_bank_id])
+    @power_bank.update(user_id: nil) # Remove user assignment (returning the power bank)
+    render json: @power_bank
   end
 
   private
