@@ -38,10 +38,8 @@ class Users::SessionsController < Devise::SessionsController
 
   def encode_token(user)
     payload = {
-      sub: user.id,
-      jti: user.jti,
-      exp: Time.now.to_i + 1.day.to_i,
-      scope: user.role
+      id: user.id,
+      jti: user.jti
     }
     JWT.encode(payload, Rails.application.credentials.dig(:devise, :jwt_secret_key))
   end

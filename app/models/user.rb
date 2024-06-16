@@ -10,4 +10,10 @@ class User < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true
   validates :role, inclusion: { in: roles.keys }
+
+  before_create :generate_jti
+
+  def generate_jti
+    self.jti ||= SecureRandom.uuid
+  end
 end
