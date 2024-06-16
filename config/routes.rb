@@ -7,7 +7,7 @@ Rails.application.routes.draw do
 
   resources :locations
   resources :warehouses
-  resources :stations, only: [:index, :show] do
+  resources :stations do
     member do
       get 'available_power_banks'
       post 'take_power_bank/:power_bank_id', action: :take_power_bank, as: :take_power_bank
