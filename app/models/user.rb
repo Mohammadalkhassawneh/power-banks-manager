@@ -16,4 +16,12 @@ class User < ApplicationRecord
   def generate_jti
     self.jti ||= SecureRandom.uuid
   end
+
+  def generate_jwt
+    payload = {
+      id: id,
+      jti: jti
+    }
+    JWT.encode(payload, Rails.application.credentials.dig(:devise, :jwt_secret_key))
+  end
 end
