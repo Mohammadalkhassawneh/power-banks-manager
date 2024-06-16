@@ -4,8 +4,9 @@ class PowerBank < ApplicationRecord
   belongs_to :user, optional: true
 
   validates :serial_number, uniqueness: true
-
   validate :validate_station_capacity
+
+  enum status: [:online, :offline]
 
   private
 
