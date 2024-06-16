@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.describe PowerBanksController, type: :controller do
   let(:valid_attributes) {
-    { attributes_for(:power_bank) }
+    attributes_for(:power_bank)
   }
 
   let(:invalid_attributes) {
-    { serial_number: nil }  # Invalid attribute to test presence validation
+    { serial_number: nil }
   }
 
   let(:valid_session) { {} }
